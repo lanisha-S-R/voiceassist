@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "_macros.html" import text_input, logo %}
+{% block title %}Forgot password{% endblock %}
+{% block page %}forgot{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card card">
+    <div class="brand-block">
+      {{ logo(56) }}
+      <h1>Forgot password</h1>
+      <p class="lead">Enter your email address to get a reset link.</p>
+    </div>
+
+    {% if sent %}
+      <div class="alert alert-success" role="status">
+        If an account exists for that email, a reset link has been created.
+        This project has no email server, so the link is printed in the terminal window where Flask is running.
+        Open that link in your browser to choose a new password. It works for 30 minutes.
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('forgot_password') }}" novalidate data-validate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ text_input('email', 'Email address', 'email', email, errors.email, 'email', 'email') }}
+      <button class="btn btn-primary btn-block" type="submit">Get reset link</button>
+    </form>
+    <p class="center"><a class="link" href="{{ url_for('login') }}">Back to log in</a></p>
+  </div>
+</section>
+{% endblock %}

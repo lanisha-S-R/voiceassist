@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import text_input, password_input, logo %}
+{% block title %}Create account{% endblock %}
+{% block page %}register{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card card">
+    <div class="brand-block">
+      {{ logo(56) }}
+      <h1>Create your account</h1>
+      <p class="lead">It only takes a minute.</p>
+    </div>
+
+    <form method="post" action="{{ url_for('register') }}" novalidate data-validate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ text_input('name', 'Full name', 'text', values.name, errors.name, 'name', 'name') }}
+      {{ text_input('email', 'Email address', 'email', values.email, errors.email, 'email', 'email') }}
+      {{ password_input('password', 'Password', errors.password, 'new-password', 'password-new',
+                        'At least 8 characters, with a letter and a number.') }}
+      {{ password_input('confirm_password', 'Confirm password', errors.confirm_password, 'new-password', 'match:password') }}
+      <button class="btn btn-primary btn-block" type="submit">Register</button>
+    </form>
+
+    <p class="center">Already have an account? <a class="link" href="{{ url_for('login') }}">Log in</a></p>
+  </div>
+</section>
+{% endblock %}

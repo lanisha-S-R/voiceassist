@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import password_input, logo %}
+{% block title %}Choose a new password{% endblock %}
+{% block page %}reset{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card card">
+    <div class="brand-block">
+      {{ logo(56) }}
+      <h1>Choose a new password</h1>
+    </div>
+    <form method="post" action="{{ url_for('reset_password', token=token) }}" novalidate data-validate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ password_input('password', 'New password', errors.password, 'new-password', 'password-new',
+                        'At least 8 characters, with a letter and a number.') }}
+      {{ password_input('confirm_password', 'Confirm new password', errors.confirm_password, 'new-password', 'match:password') }}
+      <button class="btn btn-primary btn-block" type="submit">Change password</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

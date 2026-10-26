@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mic_icon, mic_status %}
+{% block title %}Review {{ spec.title }}{% endblock %}
+{% block page %}review{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Review your details</h1>
+  <p class="lead">{{ spec.title }}. Please check everything carefully. Nothing is saved until you confirm.</p>
+</div>
+
+<section class="card review-card" id="review-app" data-sentences='{{ sentences|tojson }}'>
+  <dl class="review-list">
+    {% for item in items %}
+      <div class="review-row">
+        <dt>{{ item.label }}</dt>
+        <dd>{{ item.value }}</dd>
+        <dd class="row-action">
+          <a class="link" href="{{ url_for('form_page', kind=kind, edit=1, focus=item.name) }}"
+             aria-label="Change {{ item.label }}">Change</a>
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
+
+  <p class="question-big" id="review-question">Are these details correct?</p>
+
+  <div class="review-actions">
+    <form method="post" action="{{ url_for('submit', kind=kind) }}" id="confirm-form" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="confirmed" value="yes">
+      <button type="submit" class="btn btn-primary btn-large" id="btn-confirm">Confirm Details</button>
+    </form>
+    <a class="btn btn-secondary btn-large" id="link-edit" href="{{ url_for('form_page', kind=kind, edit=1) }}">Edit Details</a>
+    <button type="button" class="btn btn-secondary btn-large" id="btn-read-again">Read Again</button>
+    <form method="post" action="{{ url_for('cancel', kind=kind) }}" id="cancel-form" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-danger btn-large" id="btn-cancel">Cancel</button>
+    </form>
+  </div>
+
+  <div class="voice-answer">
+    <button type="button" class="btn btn-voice" id="btn-voice-answer" data-mic>
+      {{ mic_icon(22) }} Answer by Voice
+    </button>
+    {{ mic_status() }}
+    <p class="hint">Say &ldquo;confirm&rdquo;, &ldquo;edit&rdquo;, &ldquo;read again&rdquo; or &ldquo;cancel&rdquo;.</p>
+    <p class="heard" aria-live="polite"><strong>Heard:</strong> <span id="heard-text">Nothing yet</span></p>
+  </div>
+</section>
+{% endblock %}

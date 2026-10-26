@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My Submissions{% endblock %}
+{% block page %}submissions{% endblock %}
+{% block content %}
+<div class="page-head">
+  <a class="back-link" href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a>
+  <h1>My Submissions</h1>
+  <p class="lead">Everything you have submitted with VoiceAssist.</p>
+</div>
+
+{% for group in groups %}
+  <section class="sub-group" aria-labelledby="grp-{{ group.kind }}">
+    <h2 id="grp-{{ group.kind }}">{{ group.title }} <span class="badge">{{ group.entries|length }}</span></h2>
+    {% if group.entries %}
+      <div class="sub-list">
+        {% for item in group.entries %}
+          <article class="card sub-card" id="sub-{{ group.kind }}-{{ item.id }}">
+            <header class="sub-head">
+              <strong>{{ item.reference }}</strong>
+              <span class="muted">{{ item.submitted_at }}</span>
+            </header>
+            <dl class="detail-list">
+              {% for label, value in item.details %}
+                <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
+              {% endfor %}
+            </dl>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No submissions yet. <a class="link" href="{{ url_for('form_page', kind=group.kind) }}">Open this form</a></p>
+    {% endif %}
+  </section>
+{% endfor %}
+{% endblock %}

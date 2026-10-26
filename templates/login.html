@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import text_input, password_input, mic_icon, mic_status, logo %}
+{% block title %}Log in{% endblock %}
+{% block page %}login{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card card">
+    <div class="brand-block">
+      {{ logo(64) }}
+      <h1>VoiceAssist</h1>
+      <p class="lead">Accessible voice-based form filling</p>
+    </div>
+
+    {% if errors.form %}<div class="alert alert-error" role="alert">{{ errors.form }}</div>{% endif %}
+
+    <form method="post" action="{{ url_for('login') }}" novalidate data-validate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ text_input('email', 'Email address', 'email', email, errors.email, 'email', 'email') }}
+      {{ password_input('password', 'Password', errors.password, 'current-password', 'required') }}
+      <button class="btn btn-primary btn-block" type="submit">Log in</button>
+    </form>
+
+    <div class="auth-links">
+      <a class="btn btn-secondary" href="{{ url_for('register') }}">Register</a>
+      <a class="link" href="{{ url_for('forgot_password') }}" id="link-forgot">Forgot password?</a>
+    </div>
+
+    <hr>
+    <button id="btn-voice-login" class="btn btn-voice btn-block" type="button" data-mic>
+      {{ mic_icon(22) }} Start Voice Assistance
+    </button>
+    {{ mic_status() }}
+    <p class="hint center">Say your email address, or say &ldquo;register&rdquo; or &ldquo;forgot password&rdquo;. For your safety, type your password.</p>
+  </div>
+</section>
+{% endblock %}

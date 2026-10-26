@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mic_icon, mic_status %}
+{% block title %}Dashboard{% endblock %}
+{% block page %}dashboard{% endblock %}
+{% block content %}
+<section class="hero card">
+  <div>
+    <p class="eyebrow">Dashboard</p>
+    <h1>Welcome, <span class="user-name">{{ g.user.name }}</span>!</h1>
+    <p class="lead">Choose a form below, or use your voice. Press the button and say, for example,
+      &ldquo;Open student registration form.&rdquo;</p>
+  </div>
+  <div class="hero-voice">
+    <button id="btn-voice-dashboard" class="btn btn-voice btn-large" type="button" data-mic>
+      {{ mic_icon(26) }} Start Voice Assistant
+    </button>
+    {{ mic_status() }}
+  </div>
+</section>
+
+<section aria-labelledby="forms-title">
+  <h2 id="forms-title">Choose a form</h2>
+  <div class="tile-grid">
+    <article class="card tile">
+      <div class="tile-icon" aria-hidden="true">&#127891;</div>
+      <h3>Student Registration Form</h3>
+      <p>Name, register number, email, phone, department and year of study.</p>
+      <a class="btn btn-primary" href="{{ url_for('form_page', kind='student') }}" data-voice-target="student">Open form</a>
+    </article>
+    <article class="card tile">
+      <div class="tile-icon" aria-hidden="true">&#128172;</div>
+      <h3>Feedback Form</h3>
+      <p>Tell us what you think. Give a rating and a short message.</p>
+      <a class="btn btn-primary" href="{{ url_for('form_page', kind='feedback') }}" data-voice-target="feedback">Open form</a>
+    </article>
+    <article class="card tile">
+      <div class="tile-icon" aria-hidden="true">&#9993;</div>
+      <h3>Contact Form</h3>
+      <p>Send us a message with your contact details.</p>
+      <a class="btn btn-primary" href="{{ url_for('form_page', kind='contact') }}" data-voice-target="contact">Open form</a>
+    </article>
+  </div>
+</section>
+
+<section class="card" id="my-submissions" aria-labelledby="subs-title">
+  <div class="section-head">
+    <h2 id="subs-title">My Submissions</h2>
+    <a class="btn btn-secondary" href="{{ url_for('submissions') }}" data-voice-target="submissions">View all submissions</a>
+  </div>
+  <ul class="stat-row">
+    <li><strong>{{ counts.student }}</strong> Student registration{{ '' if counts.student == 1 else 's' }}</li>
+    <li><strong>{{ counts.feedback }}</strong> Feedback</li>
+    <li><strong>{{ counts.contact }}</strong> Contact message{{ '' if counts.contact == 1 else 's' }}</li>
+  </ul>
+  {% if recent %}
+    <h3>Recent</h3>
+    <ul class="recent-list">
+      {% for r in recent %}
+        <li><a href="{{ url_for('submissions') }}#sub-{{ r.kind }}-{{ r.id }}">{{ r.title }}</a>
+          <span class="muted">{{ r.reference }} &middot; {{ r.submitted_at }}</span></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">You have not submitted any forms yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

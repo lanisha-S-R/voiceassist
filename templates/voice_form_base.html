@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mic_icon, mic_status %}
+{% block title %}{{ spec.title }}{% endblock %}
+{% block page %}form{% endblock %}
+{% block content %}
+<div class="page-head">
+  <a class="back-link" href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a>
+  <h1>{{ spec.title }}</h1>
+  <p class="lead">{% block form_intro %}{% endblock %}</p>
+</div>
+
+<div id="voice-unsupported" class="alert alert-warning" role="status" hidden></div>
+
+<div class="form-layout" id="form-app" data-config='{{ cfg|tojson }}'>
+
+  <section class="voice-panel card" aria-labelledby="vp-title">
+    <h2 id="vp-title">Voice assistant</h2>
+
+    <div class="mic-wrap">
+      <button type="button" class="mic-btn" id="btn-mic" data-mic aria-label="Answer the current question by voice">
+        {{ mic_icon(34) }}
+      </button>
+      {{ mic_status() }}
+    </div>
+
+    <p class="current-question" id="current-question" aria-live="polite"></p>
+
+    <div class="heard" aria-live="polite">
+      <strong>Heard:</strong> <span id="heard-text">Nothing yet</span>
+    </div>
+
+    <div class="progress-block">
+      <div class="progress" id="progress" role="progressbar" aria-label="Form progress"
+           aria-valuemin="0" aria-valuemax="{{ spec.fields|length }}" aria-valuenow="0">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p id="progress-text" class="progress-text">Question 1 of {{ spec.fields|length }}</p>
+    </div>
+
+    <div class="btn-grid">
+      <button type="button" class="btn btn-primary btn-wide" id="btn-start">Start Voice</button>
+      <button type="button" class="btn btn-danger" id="btn-stop">Stop Voice</button>
+      <button type="button" class="btn btn-secondary" id="btn-repeat">Repeat Question</button>
+      <button type="button" class="btn btn-secondary" id="btn-read">Read Answer</button>
+      <button type="button" class="btn btn-secondary" id="btn-edit">Edit Answer</button>
+      <button type="button" class="btn btn-secondary" id="btn-prev">Previous Question</button>
+      <button type="button" class="btn btn-secondary btn-wide" id="btn-next">Next Question</button>
+    </div>
+
+    <label class="check">
+      <input type="checkbox" id="auto-listen" checked>
+      Listen automatically after each question
+    </label>
+    <p class="hint">The microphone only turns on after you press a voice button, listens once, then turns off.
+      You can always type your answers instead.</p>
+  </section>
+
+  <form class="card form-card" id="voice-form" method="post" action="{{ url_for('form_page', kind=kind) }}" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2>Your details</h2>
+    <p class="hint">Type here, or use the voice assistant. Your answers fill in automatically.</p>
+
+    {% for f in spec.fields %}
+      {% set err = errors.get(f.name, '') %}
+      <div class="field{% if err %} has-error{% endif %}" id="field-{{ f.name }}" data-field="{{ f.name }}">
+        <label for="{{ f.name }}"><span class="q-num" aria-hidden="true">{{ loop.index }}</span>{{ f.label }}</label>
+        {% if f.kind == 'select' %}
+          <select id="{{ f.name }}" name="{{ f.name }}" aria-required="true" aria-describedby="err-{{ f.name }}"{% if err %} aria-invalid="true"{% endif %}>
+            <option value="">Select {{ f.label|lower }}&hellip;</option>
+            {% for o in f.options %}
+              <option value="{{ o.value }}"{% if values.get(f.name) == o.value %} selected{% endif %}>{{ o.label }}</option>
+            {% endfor %}
+          </select>
+        {% elif f.kind == 'textarea' %}
+          <textarea id="{{ f.name }}" name="{{ f.name }}" rows="5" maxlength="{{ f.max }}" aria-required="true"
+                    aria-describedby="err-{{ f.name }}"{% if err %} aria-invalid="true"{% endif %}>{{ values.get(f.name, '') }}</textarea>
+        {% else %}
+          <input id="{{ f.name }}" name="{{ f.name }}" type="{{ f.type or 'text' }}" value="{{ values.get(f.name, '') }}"
+                 autocomplete="{{ f.autocomplete or 'off' }}"{% if f.inputmode %} inputmode="{{ f.inputmode }}"{% endif %}
+                 {% if f.max %}maxlength="{{ f.max }}"{% endif %} aria-required="true"
+                 aria-describedby="err-{{ f.name }}"{% if err %} aria-invalid="true"{% endif %}>
+        {% endif %}
+        <p class="field-error" id="err-{{ f.name }}" role="alert">{{ err }}</p>
+      </div>
+    {% endfor %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary btn-large" id="btn-review">Review Details</button>
+      <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
